@@ -36,6 +36,11 @@ impl<T> LinkedList<T> {
     pub fn new() -> Self {
         LinkedList { head: None }
     }
+    pub fn iter(&self) -> Iter<'_, T> {
+        Iter {
+            current: self.head.as_deref(),
+        }
+    }
     pub fn push_front(&mut self, value: T) {
         let old_node = self.head.take();
         let new_node = Box::new(Node {
@@ -70,5 +75,30 @@ impl<T> LinkedList<T> {
             current = node.next.as_ref();
         }
         len
+    }
+    pub fn pop_back(&mut self) -> Option<T> {
+        match self.head.as_mut() {
+            None => None,
+            Some(node) if node.next.is_none() => {
+                let val = self.head.take().unwrap();
+                Some(val.value)
+            }
+            Some(_) => {
+                let mut curr = self.head.as_mut().unwrap();
+                while curr.next.as_ref().unwrap().next.is_some() {
+                    curr = curr.next.as_mut().unwrap();
+                }
+                let last = curr.next.take().unwrap();
+                Some(last.value)
+            }
+        }
+    }
+}
+impl<T> Drop for LinkedList<T> {
+    fn drop(&mut self) {
+        let mut curr = self.head.take();
+        while let Some(mut boxed_node) = curr {
+            curr = boxed_node.next.take();
+        }
     }
 }
