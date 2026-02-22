@@ -93,6 +93,18 @@ impl<T> LinkedList<T> {
             }
         }
     }
+    pub fn push_back(&mut self, value: T) {
+        let new_node = Box::new(Node { value, next: None });
+        match self.head.as_mut() {
+            None => self.head = Some(new_node),
+            Some(mut curr) => {
+                while curr.next.is_some() {
+                    curr = curr.next.as_mut().unwrap();
+                }
+                curr.next = Some(new_node);
+            }
+        }
+    }
 }
 impl<T> Drop for LinkedList<T> {
     fn drop(&mut self) {
